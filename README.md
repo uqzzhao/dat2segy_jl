@@ -1,2 +1,2 @@
-# dat2segy_jl
-JLU .dat file to SEG-Y file converter
+# dat2segy
+Data format conversion from .dat to SEG-Y format
