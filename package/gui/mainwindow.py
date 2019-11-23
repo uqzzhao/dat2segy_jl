@@ -195,7 +195,7 @@ class MainWindow(QMainWindow):
         self.createToolBars()
         self.createStatusBar()
 
-        self.resize(400, 300)   
+        self.resize(800, 500)   
 
         # Connect all necessary signals and slots.
         self._connect_signals_and_slots()
