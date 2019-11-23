@@ -60,6 +60,31 @@ HH = [  '00',
         '20',
         '21',
         '22',
+        '23']
+
+MM = [  '00', 
+        '01', 
+        '02',
+        '03',
+        '04',
+        '05',
+        '06',
+        '07',
+        '08',
+        '09',
+        '10',
+        '11',
+        '12',
+        '13',
+        '14',
+        '15',
+        '16',
+        '17',
+        '18',
+        '19',
+        '20',
+        '21',
+        '22',
         '23',
         '24',
         '25',
@@ -512,7 +537,7 @@ def main():
 
             tlist = []
 
-            for m in HH:
+            for m in MM:
 
                 filelist = []
                 
@@ -531,9 +556,10 @@ def main():
                         filelist.append(filename)
                         rcvlist.append(rcv_list[i])
             
-                outfile = transform_separator(os.path.join(outpath, timestamp + '.sgy'))
+                if len(filelist):
+                    outfile = transform_separator(os.path.join(outpath, timestamp + '.sgy'))
 
-                convert2segy(outfile, filelist, rcvlist, args)
+                    convert2segy(outfile, filelist, rcvlist, args)
 
             
 

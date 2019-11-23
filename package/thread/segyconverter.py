@@ -125,7 +125,7 @@ MM = [  '00',
         '58',
         '59']
 
-
+YMD = ['20191111', '20191112', '20191113', '20191114', '20191115','20191116','20191117']
 
 def parseDataBuffer(fs, dsf = 'int32', endian = '>', skip = 512, com = 3):
 
@@ -197,9 +197,9 @@ def list_subfolders(root):
     
         files = os.listdir(root)
 
-        for file in files:
+        for ff in files:
             
-            path = transform_separator(os.path.join(root,file))
+            path = transform_separator(os.path.join(root,ff))
             
             if (os.path.isdir(path)):
                 h = os.path.split(path)
@@ -227,17 +227,17 @@ def list_subfiles(root):
     
         files = os.listdir(root)
 
-        for file in files:
+        for ff in files:
             
-            path = transform_separator(os.path.join(root,file))
+            path = transform_separator(os.path.join(root,ff))
             
             if (os.path.isfile(path)):
                 h = os.path.split(path)
 
-                file = h[1]
+                f = h[1]
                 
-                file_list.append(file)
-                map_dict[folder] = path
+                file_list.append(f)
+                map_dict[f] = path
 
 
     return file_list, map_dict 
@@ -260,6 +260,7 @@ def convert2segy(outfile, filelist, rcvlist, args):
     i = 0
 
     data = None
+    inds = [0]
 
     for filename, rcvname in zip(filelist, rcvlist):
 
@@ -275,7 +276,13 @@ def convert2segy(outfile, filelist, rcvlist, args):
 
         else:
 
-            data = np.concatenate((data, traces), axis = 1)
+            ld = data.shape[0]
+            lt = traces.shape[0]
+
+            if ld == lt:
+
+                data = np.concatenate((data, traces), axis = 1)
+                inds.append(i)
 
 
 
@@ -287,6 +294,7 @@ def convert2segy(outfile, filelist, rcvlist, args):
     ## prepare SEGY header
     dt = args['dt']
     ns, ntr = data.shape
+    rcvs = np.array(rcvlist)[inds]
     
 
     SH = pssegy.getDefaultSegyHeader(ntr, ns, dt)
@@ -298,9 +306,9 @@ def convert2segy(outfile, filelist, rcvlist, args):
 
     field = args['rcv_field']
 
-    STH[field][0:int(ntr/3)] = np.array(rcvlist)
-    STH[field][int(ntr/3): 2*int(ntr/3)] = np.array(rcvlist)
-    STH[field][2*int(ntr/3): 3*int(ntr/3)] = np.array(rcvlist)
+    STH[field][0:int(ntr/3)] = rcvs
+    STH[field][int(ntr/3): 2*int(ntr/3)] = rcvs
+    STH[field][2*int(ntr/3): 3*int(ntr/3)] = rcvs
 
 
     # deal with date time
@@ -457,37 +465,48 @@ class SegyConverterThread(QThread):
                 self.running = True
                 break
 
-            for h in HH:
+            if fd in YMD:
 
-                tlist = []
+                for h in HH:
 
-                for m in MM:
+                    tlist = []
 
-                    filelist = []
-                    
-                    rcvlist = []
+                    for m in MM:
 
-                    
-                    timestamp = fd + '_' + h + m + '00'
-                    tlist.append(timestamp)
+                        filelist = []
+                        
+                        rcvlist = []
 
-                    for i, rcv in enumerate(rcvfolders):
+                        
+                        timestamp = fd + '_' + h + m + '00'
 
-                        filename =  transform_separator(os.path.join(root, rcv, fd, h, m + 'T.dat'))
+                        outfile = transform_separator(os.path.join(outpath, timestamp + '.sgy'))
 
-                        if os.path.exists(filename):
+                        if not os.path.exists(outfile):
+                        
+                            tlist.append(timestamp)
 
-                            filelist.append(filename)
-                            rcvlist.append(rcv_list[i])
-                
-                    outfile = transform_separator(os.path.join(outpath, timestamp + '.sgy'))
+                            for i, rcv in enumerate(rcvfolders):
 
-                    self.labelSignal_.emit('Writing SEG-Y file: ' + outfile)    
-                    print('Writing SEG-Y file: ' + outfile)
+                                filename =  transform_separator(os.path.join(root, rcv, fd, h, m + 'T.dat'))
 
-                    if len(filelist):
-                        convert2segy(outfile, filelist, rcvlist, args)
-                        self.progressSignal_.emit(n, maxVal) 
+                                if os.path.exists(filename):
+
+                                    filelist.append(filename)
+                                    rcvlist.append(rcv_list[i])
+                        
+                            
+
+                            if len(filelist):
+                                self.labelSignal_.emit('Writing SEG-Y file: ' + outfile)    
+                                print('Writing SEG-Y file: ' + outfile)
+
+                                convert2segy(outfile, filelist, rcvlist, args)
+                                self.progressSignal_.emit(n, maxVal) 
+                        
+                        else:
+                            self.labelSignal_.emit('Skip writing SEG-Y file: ' + outfile)    
+                            print('Skip writing SEG-Y file: ' + outfile)
 
         self.finishSignal_.emit(int(1), 'SEG-Y files conversion completed.') 
 
