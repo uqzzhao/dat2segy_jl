@@ -62,6 +62,31 @@ HH = [  '00',
         '20',
         '21',
         '22',
+        '23']
+
+MM = [  '00', 
+        '01', 
+        '02',
+        '03',
+        '04',
+        '05',
+        '06',
+        '07',
+        '08',
+        '09',
+        '10',
+        '11',
+        '12',
+        '13',
+        '14',
+        '15',
+        '16',
+        '17',
+        '18',
+        '19',
+        '20',
+        '21',
+        '22',
         '23',
         '24',
         '25',
@@ -436,7 +461,7 @@ class SegyConverterThread(QThread):
 
                 tlist = []
 
-                for m in HH:
+                for m in MM:
 
                     filelist = []
                     
@@ -460,8 +485,9 @@ class SegyConverterThread(QThread):
                     self.labelSignal_.emit('Writing SEG-Y file: ' + outfile)    
                     print('Writing SEG-Y file: ' + outfile)
 
-                    convert2segy(outfile, filelist, rcvlist, args)
-                    self.progressSignal_.emit(n, maxVal) 
+                    if len(filelist):
+                        convert2segy(outfile, filelist, rcvlist, args)
+                        self.progressSignal_.emit(n, maxVal) 
 
         self.finishSignal_.emit(int(1), 'SEG-Y files conversion completed.') 
 
