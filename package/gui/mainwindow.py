@@ -1,14 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Data format conversion from .dat to SEG-Y format.
-
-@author:     Zhengguang Zhao
-@copyright:  Copyright 2016-2019, Zhengguang Zhao.
-@license:    MIT
-@contact:    zg.zhao@outlook.com
-
-
-"""
 
 import os
 
@@ -206,7 +195,7 @@ class MainWindow(QMainWindow):
         self.createToolBars()
         self.createStatusBar()
 
-        self.resize(800, 500)   
+        self.resize(400, 300)   
 
         # Connect all necessary signals and slots.
         self._connect_signals_and_slots()

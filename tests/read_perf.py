@@ -38,68 +38,7 @@ NUMPY_DTYPES = {'ibm':     np.dtype('<f4'),
                 'int8':    np.dtype('<i1')}
 
 
-HH = [  '00', 
-        '01', 
-        '02',
-        '03',
-        '04',
-        '05',
-        '06',
-        '07',
-        '08',
-        '09',
-        '10',
-        '11',
-        '12',
-        '13',
-        '14',
-        '15',
-        '16',
-        '17',
-        '18',
-        '19',
-        '20',
-        '21',
-        '22',
-        '23',
-        '24',
-        '25',
-        '26',
-        '27',
-        '28',
-        '29',
-        '30',
-        '31',
-        '32',
-        '33',
-        '34',
-        '35',
-        '36',
-        '37',
-        '38',
-        '39',
-        '40',
-        '41',
-        '42',
-        '43',
-        '44',
-        '45',
-        '46',
-        '47',
-        '48',
-        '49',
-        '50',
-        '51',
-        '52',
-        '53',
-        '54',
-        '55',
-        '56',
-        '57',
-        '58',
-        '59']
 
-YMD = ['20191111', '20191112', '20191113', '20191114', '20191115','20191116','20191117']
 
 def parseDataBuffer(fs, dsf = 'int32', endian = '>', skip = 512, com = 3):
 
@@ -346,7 +285,7 @@ def list_subfiles(root):
 
                 f = h[1]
                 
-                file_list.append()
+                file_list.append(f)
                 map_dict[f] = path
 
 
@@ -363,6 +302,19 @@ def createRcvList(rcvs, initial = 4):
         rcvNames_float.append(rfloat)
 
     return rcvNames_float
+
+def createRcvList2(rcvs, initial = 4):
+
+    rcvNames_float = []
+    for rr in rcvs:
+
+        r = rr[:3]
+
+        rfloat = float(str(initial) + r)
+
+        rcvNames_float.append(rfloat)
+
+    return rcvNames_float 
 
 
 def convert2segy(outfile, filelist, rcvlist, args):
@@ -426,8 +378,9 @@ def convert2segy(outfile, filelist, rcvlist, args):
 
     # deal with date time
 
-    basename = os.path.basename(outfile)
-    fname  = os.path.splitext(basename)[0]
+    # basename = os.path.basename(outfile)
+    # fname  = os.path.splitext(basename)[0]
+    fname = '20191126_000000'
 
     ymd_hms = fname.split('_')
     ymd = ymd_hms[0]
@@ -472,9 +425,9 @@ def convert2segy(outfile, filelist, rcvlist, args):
 
 def main():
 
-    root = 'E:/2019-测试压裂监测数据/吉林大学微震/浅井数据60点'
+    root = 'E:/射孔数据/浅井射孔数据/射孔2'
 
-    outpath = 'E:/SEGY/JLU_ALL'
+    outpath = 'E:/SEGY/Perfs'
 
     args = {'header_size': 512,
             'initial':4,
@@ -485,83 +438,34 @@ def main():
 
     # read in geophone folders as reciever list
 
-    rcvfolders, rcvfolder_dict = list_subfolders(root)
+    rcvfiles, rcvfiles_dict = list_subfiles(root)
 
 
     # create reciver list in float
 
     initial = args['initial']
 
-    rcv_list = createRcvList(rcvfolders, initial = initial)
+    rcvlist = createRcvList2(rcvfiles, initial = initial)
+
+    filelist = []
 
 
-    # create time list as dict, key = rcv, value = yymmdd
+    for fname in rcvfiles:
 
-    rcv_ymd_dict = {}
+        filename = transform_separator(os.path.join(root, fname))
+        
 
-    ymdfolders = []
-    ymdfolder_dict = {}
+        if os.path.exists(filename):
 
-    # ymd
-
-    for fd in rcvfolders:
+            filelist.append(filename)
  
 
-        rcvpath = rcvfolder_dict[fd] # receiver folder
+    outfile = transform_separator(os.path.join(outpath, 'perf2_l.sgy'))
 
-        ymdfolders, ymdfolder_dict = list_subfolders(rcvpath)
-
-        rcv_ymd_dict[fd] = ymdfolders
-
-    
-
-    # merge .dat files with same timestamp
-
-   
-    
-
-    for fd in ymdfolders:
-
-        if fd in YMD:
-
-            for h in HH:
-
-                tlist = []
-
-                for m in HH:
-
-                    filelist = []
-                    
-                    rcvlist = []
-
-                    
-                    timestamp = fd + '_' + h + m + '00'
-                    tlist.append(timestamp)
-
-                    for i, rcv in enumerate(rcvfolders):
-
-                        filename =  transform_separator(os.path.join(root, rcv, fd, h, m + 'T.dat'))
-
-                        if os.path.exists(filename):
-
-                            filelist.append(filename)
-                            rcvlist.append(rcv_list[i])
-                
-                    outfile = transform_separator(os.path.join(outpath, timestamp + '.sgy'))
-
-                    convert2segy(outfile, filelist, rcvlist, args)
+    convert2segy(outfile, filelist, rcvlist, args)
 
             
 
-
-
-            
-
-
-
-
-
-    
 
 
 

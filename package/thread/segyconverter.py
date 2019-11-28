@@ -1,13 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Data format conversion from .dat to SEG-Y format.
-
-@author:     Zhengguang Zhao
-@copyright:  Copyright 2016-2019, Zhengguang Zhao.
-@license:    MIT
-@contact:    zg.zhao@outlook.com
-
-"""
 
 import os
 import copy
@@ -35,17 +26,17 @@ l_uchar = struct.calcsize('B')
 l_float = struct.calcsize('f')
 
 
-NUMPY_DTYPES = {'ibm':     np.dtype('>f4'),
+NUMPY_DTYPES = {'ibm':     np.dtype('<f4'),
 
-                'int32':   np.dtype('>i4'),
+                'int32':   np.dtype('<i4'),
 
-                'int16':   np.dtype('>i2'),
+                'int16':   np.dtype('<i2'),
 
-                'uint16':   np.dtype('>u2'),
+                'uint16':   np.dtype('<u2'),
 
-                'float32': np.dtype('>f4'),
+                'float32': np.dtype('<f4'),
 
-                'int8':    np.dtype('>i1')}
+                'int8':    np.dtype('<i1')}
 
 
 HH = [  '00', 
@@ -134,7 +125,7 @@ MM = [  '00',
         '58',
         '59']
 
-YMD = ['20191111', '20191112', '20191113', '20191114', '20191115','20191116','20191117']
+YMD = ['20191111','20191112','20191113', '20191114', '20191115','20191116','20191117','20191118']
 
 def parseDataBuffer(fs, dsf = 'int32', endian = '>', skip = 512, com = 3):
 
@@ -359,7 +350,7 @@ def convert2segy(outfile, filelist, rcvlist, args):
     segy.toSegyFile(outfile)
    
 
-    print(outfile, ' written[OK].')
+    #print(outfile, ' written[OK].')
 
 
 
@@ -508,14 +499,14 @@ class SegyConverterThread(QThread):
 
                             if len(filelist):
                                 self.labelSignal_.emit('Writing SEG-Y file: ' + outfile)    
-                                print('Writing SEG-Y file: ' + outfile)
+                                #print('Writing SEG-Y file: ' + outfile)
 
                                 convert2segy(outfile, filelist, rcvlist, args)
                                 self.progressSignal_.emit(n, maxVal) 
                         
                         else:
                             self.labelSignal_.emit('Skip writing SEG-Y file: ' + outfile)    
-                            print('Skip writing SEG-Y file: ' + outfile)
+                            #print('Skip writing SEG-Y file: ' + outfile)
 
         self.finishSignal_.emit(int(1), 'SEG-Y files conversion completed.') 
 
