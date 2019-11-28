@@ -371,9 +371,11 @@ def convert2segy(outfile, filelist, rcvlist, args):
     STH['TraceIdentificationCode'][1:ntr:3] = 13.0
     STH['TraceIdentificationCode'][2:ntr:3] = 12.0
 
-    STH['Inline3D'][0:int(ntr/3)] = rcvs
-    STH['Inline3D'][int(ntr/3): 2*int(ntr/3)] = rcvs
-    STH['Inline3D'][2*int(ntr/3): 3*int(ntr/3)] = rcvs
+    STH['Inline3D'] = np.repeat(rcvs,3)
+
+    # STH['Inline3D'][0:int(ntr/3)] = rcvs
+    # STH['Inline3D'][int(ntr/3): 2*int(ntr/3)] = rcvs
+    # STH['Inline3D'][2*int(ntr/3): 3*int(ntr/3)] = rcvs
 
 
     # deal with date time

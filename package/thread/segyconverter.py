@@ -305,10 +305,11 @@ def convert2segy(outfile, filelist, rcvlist, args):
     STH['TraceIdentificationCode'][2:ntr:3] = 12.0
 
     field = args['rcv_field']
+    STH[field] = np.repeat(rcvs,3)
 
-    STH[field][0:int(ntr/3)] = rcvs
-    STH[field][int(ntr/3): 2*int(ntr/3)] = rcvs
-    STH[field][2*int(ntr/3): 3*int(ntr/3)] = rcvs
+    # STH[field][0:int(ntr/3)] = rcvs
+    # STH[field][int(ntr/3): 2*int(ntr/3)] = rcvs
+    # STH[field][2*int(ntr/3): 3*int(ntr/3)] = rcvs
 
 
     # deal with date time
